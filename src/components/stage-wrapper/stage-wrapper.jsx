@@ -40,7 +40,13 @@ const StageWrapperComponent = function (props) {
               )
             }>
             <div className={
-            currentLayout === 'student' ? (flagClicked?styles.stagePositionStudent:styles.stagePositionStudentHide) :
+            currentLayout === 'student' ? (
+              isFullScreen ? (
+                flagClicked ? styles.stagePositionStudentFullScreen : styles.stagePositionStudentHide
+              ) : (
+                flagClicked ? styles.stagePositionStudent : styles.stagePositionStudentHide
+              )
+            ):
             currentLayout === 'teacher' ? (flagClicked?styles.stagePositionTeacher:styles.stagePositionTeacherHide) :
             flagClicked ?(isFullScreen ? styles.stagePositionFullScreen : styles.stagePosition) :styles.stagePositionHide
           }>

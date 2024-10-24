@@ -89,6 +89,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow: scroll;
+
 }
 .canvas-pos{
     display: none;
@@ -133,6 +135,17 @@
     justify-content: center;
     align-items: center;
     background-color: white;
+}
+.stage-position-student-full-screen{
+    width: auto;
+    left: 2rem;
+    height: auto;
+    z-index: 999;
+    visibility: visible;
+    opacity: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .stage-position-student-hide{
