@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import omit from 'lodash.omit'
 import PropTypes from 'prop-types'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { defineMessages, FormattedMessage, injectIntl, intlShape } from 'react-intl'
 import { connect } from 'react-redux'
 import MediaQuery from 'react-responsive'
@@ -9,6 +9,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import tabStyles from 'react-tabs/style/react-tabs.css'
 import VM from 'scratch-vm'
 import Renderer from 'scratch-render'
+import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride'
 
 import Blocks from '../../containers/blocks.jsx'
 import CostumeTab from '../../containers/costume-tab.jsx'
@@ -69,6 +70,57 @@ let isRendererSupported = null
 
 
 const GUIComponent = (props) => {
+  // Add walkthrough state
+  const [walkthroughRun, setWalkthroughRun] = useState(false);
+  const [walkthroughStepIndex, setWalkthroughStepIndex] = useState(0);
+  
+  // Define walkthrough steps
+  const walkthroughSteps = [
+    {
+        target: '.green-flag_green-flag_1kiAo',  // Target the green flag button
+        content: 'Click the green flag to start your project!',
+        disableBeacon: true
+    },
+    {
+        target: '.sprite-selector_sprite-selector_2GALv',  // Target the sprite selector
+        content: 'This is the sprite panel where you can select and manage sprites.',
+        disableBeacon: true
+    },
+    {
+        target: '.blocks-wrapper_blocks_1Mu6K',  // Target the blocks area
+        content: 'Drag and drop blocks here to program your sprite.',
+        disableBeacon: true
+    },
+    {
+        target: '.stage_stage_1fD7k',  // Target the stage
+        content: 'This is the stage where you can see your project running.',
+        disableBeacon: true
+    }
+  ];
+  
+  // Handle Joyride callbacks
+  const handleWalkthroughCallback = (data) => {
+    const { action, index, status, type } = data;
+    
+    if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
+        // Update state to advance the tour
+        setWalkthroughStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
+    } else if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
+        // Reset the walkthrough when finished or skipped
+        setWalkthroughRun(false);
+        setWalkthroughStepIndex(0);
+    }
+    
+    console.groupCollapsed(type);
+    console.log(data);
+    console.groupEnd();
+  };
+  
+  // Function to start the walkthrough
+  const startWalkthrough = () => {
+    setWalkthroughRun(true);
+  };
+
   const {
     accountNavOpen,
     activeTabIndex,
@@ -265,6 +317,23 @@ const GUIComponent = (props) => {
           </StageWrapper>
         ) : (
           <Box className={styles.pageWrapper} dir={isRtl ? 'rtl' : 'ltr'} {...componentProps}>
+            {/* Add Joyride component */}
+            <Joyride
+              callback={handleWalkthroughCallback}
+              continuous
+              hideCloseButton
+              run={walkthroughRun}
+              scrollToFirstStep
+              showSkipButton
+              stepIndex={walkthroughStepIndex}
+              steps={walkthroughSteps}
+              styles={{
+                options: {
+                  zIndex: 10000,
+                  primaryColor: '#4C97FF'
+                }
+              }}
+            />
             {telemetryModalVisible ? (
               <TelemetryModal
                 isRtl={isRtl}
@@ -315,6 +384,23 @@ const GUIComponent = (props) => {
                 <LanguageMenu />
               </div>
               <div className={styles.settingIcon}>
+                <button 
+                  style={{
+                    border: 'none',
+                    backgroundColor: '#4C97FF',
+                    color: 'white',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '4px',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    marginRight: '0.75rem',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onClick={startWalkthrough}
+                  title="Start Walkthrough"
+                >
+                  Tutorial
+                </button>
                 <MenuBarGuiSub
                   accountNavOpen={accountNavOpen}
                   authorId={authorId}
@@ -348,6 +434,7 @@ const GUIComponent = (props) => {
                   onStartSelectingFileUpload={onStartSelectingFileUpload}
                   onToggleLoginOpen={onToggleLoginOpen}
                   currentLayout={currentLayout}
+                  onStartWalkthrough={startWalkthrough}
                 />
               </div>
             </div>
@@ -549,6 +636,7 @@ GUIComponent.propTypes = {
   theme: PropTypes.string,
   tipsLibraryVisible: PropTypes.bool,
   vm: PropTypes.instanceOf(VM).isRequired,
+  onStartWalkthrough: PropTypes.func,
 }
 GUIComponent.defaultProps = {
   backpackHost: null,
