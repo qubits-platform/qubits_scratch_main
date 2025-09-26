@@ -58,9 +58,6 @@ class Controls extends React.Component {
       isStarted, // eslint-disable-line no-unused-vars
       projectRunning,
       turbo,
-      greenFlagClicked, // eslint-disable-line no-unused-vars
-      setFlagClickedState, // eslint-disable-line no-unused-vars
-      setSpriteClickedState, // eslint-disable-line no-unused-vars
       ...props
     } = this.props
     return (

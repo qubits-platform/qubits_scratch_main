@@ -138,12 +138,6 @@ const GUIComponent = (props) => {
     onTelemetryModalCancel,
     onTelemetryModalOptIn,
     onTelemetryModalOptOut,
-    setPositionModal,
-    setProjectName,
-    setSpriteClickedState,
-    addNotification,
-    removeNotification,
-    setCurrentLayout,
     showComingSoon,
     soundsTabVisible,
     stageSizeMode,
@@ -193,10 +187,7 @@ const GUIComponent = (props) => {
           messenger,
           methods: {
             getScratchState(message) {
-              // Use setTimeout to defer the state update to avoid updating during render
-              setTimeout(() => {
-                props.setProjectName(message)
-              }, 0)
+              props.setProjectName(message)
             },
           },
           timeout: 15000,
@@ -221,9 +212,9 @@ const GUIComponent = (props) => {
 
   useEffect(() => {
     if (currentLayout === 'myprojects') {
-      setPositionModal(true)
+      props.setPositionModal(true)
     }
-  }, [currentLayout, setPositionModal])
+  }, [currentLayout])
 
   useEffect(() => {
     if (remote && currentLayout === 'studentChallenge') {

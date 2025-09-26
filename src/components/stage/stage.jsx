@@ -25,7 +25,6 @@ const StageComponent = (props) => {
     colorInfo,
     micIndicator,
     question,
-    setFlagClickedState,
     stageSize,
     useEditorDragStyle,
     onDeactivateColorPicker,

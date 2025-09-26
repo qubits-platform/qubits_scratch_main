@@ -334,9 +334,7 @@ class Blocks extends React.Component {
         })
       }, 0)
     }
-    // REMOVED: this.handleGreenbuttonClick() - This was causing infinite renders
-    // The handleGreenbuttonClick was updating Redux state on every workspace metric change,
-    // which triggered re-renders that caused more workspace metric changes.
+   this.handleGreenbuttonClick()
   }
   onScriptGlowOn(data) {
     this.workspace.glowStack(data.id, true)
@@ -576,14 +574,10 @@ class Blocks extends React.Component {
     /* eslint-disable no-unused-vars */
     const {
       anyModalVisible,
-      autoSave,
       canUseCloud,
       customProceduresVisible,
       extensionLibraryVisible,
-      flagClicked,
       options,
-      setAutoSaveState,
-      setFlagClickedState,
       stageSize,
       vm,
       isRtl,

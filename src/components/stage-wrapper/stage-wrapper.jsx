@@ -15,7 +15,7 @@ import styles from './stage-wrapper.css'
 
 
 const StageWrapperComponent = function (props) {
-  const { isFullScreen, isRtl, isRendererSupported, loading, stageSize, vm, flagClicked, currentLayout, setFlagClickedState } = props
+  const { isFullScreen, isRtl, isRendererSupported, loading, stageSize, vm, flagClicked, currentLayout } = props
   return (
     <Box
       className={classNames(styles.stageWrapper, { [styles.fullScreen]: isFullScreen })}

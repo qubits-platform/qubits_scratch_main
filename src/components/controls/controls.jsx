@@ -29,7 +29,6 @@ const Controls = function (props) {
   const {
     active,
     className,
-    costumeURLFax,
     intl,
     onGreenFlagClick,
     onStopAllClick,
@@ -124,4 +123,4 @@ const mapStateToProps = (state) => ({
   flagClicked: state.scratchGui.vmStatus.flagClicked,
 })
 
-export default injectIntl(connect(mapStateToProps, () => ({}))(Controls))
+export default injectIntl(connect(mapStateToProps, null)(Controls))
