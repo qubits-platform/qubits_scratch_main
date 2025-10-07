@@ -95,7 +95,7 @@ import oldtimeyLogo from './oldtimey-logo.svg'
 
 import sharedMessages from '../../lib/shared-messages'
 import { ChevronDoubleDownIcon, FolderIcon } from '@heroicons/react/24/outline'
-// import data from './content.json';
+import {data} from './data.js';
 
 
 class MenuBarGuiSub extends React.Component {
@@ -410,7 +410,8 @@ class MenuBarGuiSub extends React.Component {
     const url = new URLSearchParams(window.location.search)
 
     const projectId = url.get('projectid')
-    const currentLayout = url.get('inputLayout')
+    // const currentLayout = url.get('inputLayout')
+    const currentLayout = 'myprojects'
     let result
 
     const scratchElementSettingsId = url.get('scratchElementSettingsId')
@@ -446,7 +447,7 @@ class MenuBarGuiSub extends React.Component {
         this.onLocalStorageFileUploadTeacher(result)
       } else if (currentLayout === 'myprojects') {
         result = await this.fetchProjectData(projectId, fetchapiurl)
-        this.onLocalStorageFileUploadStudentmyproject(result.content)
+        this.onLocalStorageFileUploadStudentmyproject(data)
       } else if (currentLayout === 'chapter') {
         result = await this.fetchChpaterData(scratchUrl, fetchapiurl)
         this.onLocalStorageFileUploadStudentmyproject(result.content)
@@ -495,6 +496,7 @@ class MenuBarGuiSub extends React.Component {
   }
 
   async onLocalStorageFileUploadStudentmyproject(base64blocks) {
+    console.log('base64blocks', base64blocks)
     if(base64blocks === null) {
       this.props.onClickFirstFalse()
     }
@@ -504,6 +506,7 @@ class MenuBarGuiSub extends React.Component {
       bytes[i] = binaryString.charCodeAt(i)
     }
     await new Promise((resolve) => setTimeout(resolve, 500))
+    console.log('bytes', bytes.buffer)
     await this.props.vm.loadProject(bytes.buffer)
     this.props.onClickFirstFalse()
   }
