@@ -447,7 +447,7 @@ class MenuBarGuiSub extends React.Component {
         this.onLocalStorageFileUploadTeacher(result)
       } else if (currentLayout === 'myprojects') {
         result = await this.fetchProjectData(projectId, fetchapiurl)
-        this.onLocalStorageFileUploadStudentmyproject(data)
+        this.onLocalStorageFileUploadStudentmyproject(data.body.content)
       } else if (currentLayout === 'chapter') {
         result = await this.fetchChpaterData(scratchUrl, fetchapiurl)
         this.onLocalStorageFileUploadStudentmyproject(result.content)
