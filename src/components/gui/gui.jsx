@@ -52,7 +52,15 @@ import {
   setProjectName,
   setPositionModal,
   setCurrentLayout,
+  undoProject,
+  redoProject,
+  updateHistoryNavigation,
 } from './../../reducers/vm-status.js'
+import {
+  restoreProjectFromHistory,
+  getPreviousHistoryItem,
+  getNextHistoryItem,
+} from '../../lib/project-history-utils.js'
 import LanguageMenu from '../menu-bar/language-menu.jsx'
 import localforage from 'localforage'
 import { MenuItem, MenuSection } from '../menu/menu.jsx'
@@ -162,6 +170,15 @@ const GUIComponent = (props) => {
     isEditableProject,
     isCloned,
     currentLayout,
+    // History props
+    projectHistory,
+    historyIndex,
+    canUndo,
+    canRedo,
+    isRestoringFromHistory,
+    undoProject,
+    redoProject,
+    updateHistoryNavigation,
     ...componentProps
   } = omit(props, 'dispatch')
   if (children) {
@@ -257,6 +274,45 @@ const GUIComponent = (props) => {
     }
   }
 
+  // History handlers
+  const handleUndo = async () => {
+    if (!canUndo || isSaving || isPendingState || isRestoringFromHistory) return;
+    
+    const previousItem = getPreviousHistoryItem(projectHistory, historyIndex);
+    if (previousItem) {
+      undoProject();
+      await restoreProjectFromHistory(vm, previousItem, updateHistoryNavigation, addNotification);
+    }
+  };
+
+  const handleRedo = async () => {
+    if (!canRedo || isSaving || isPendingState || isRestoringFromHistory) return;
+    
+    const nextItem = getNextHistoryItem(projectHistory, historyIndex);
+    if (nextItem) {
+      redoProject();
+      await restoreProjectFromHistory(vm, nextItem, updateHistoryNavigation, addNotification);
+    }
+  };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+      
+      if (isCtrlOrCmd && event.key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        handleUndo();
+      } else if (isCtrlOrCmd && (event.key === 'y' || (event.key === 'z' && event.shiftKey))) {
+        event.preventDefault();
+        handleRedo();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [canUndo, canRedo, isSaving, isPendingState, isRestoringFromHistory, projectHistory, historyIndex]);
+
   return (
     <MediaQuery minWidth={layout.fullSizeMinWidth}>
       {(isFullSize) => {
@@ -330,6 +386,37 @@ const GUIComponent = (props) => {
                         <img src={EditAction} />
                       </div>
                     )}
+                    
+                    {/* Undo/Redo History Controls */}
+                    {currentLayout === 'myprojects' && (String(isEditableProject) === 'true' || isCloned) && (
+                      <div className={styles.historyControls}>
+                        <button
+                          className={styles.undoButton}
+                          disabled={!canUndo || isSaving || isPendingState || isRestoringFromHistory}
+                          onClick={handleUndo}
+                          title={canUndo ? 'Undo (Ctrl+Z)' : 'No changes to undo'}
+                          style={{
+                            opacity: (!canUndo || isSaving || isPendingState || isRestoringFromHistory) ? 0.3 : 1,
+                            pointerEvents: (!canUndo || isSaving || isPendingState || isRestoringFromHistory) ? 'none' : 'auto'
+                          }}
+                        >
+                          <span>↶</span>
+                        </button>
+                        <button
+                          className={styles.redoButton}
+                          disabled={!canRedo || isSaving || isPendingState || isRestoringFromHistory}
+                          onClick={handleRedo}
+                          title={canRedo ? 'Redo (Ctrl+Y)' : 'No changes to redo'}
+                          style={{
+                            opacity: (!canRedo || isSaving || isPendingState || isRestoringFromHistory) ? 0.3 : 1,
+                            pointerEvents: (!canRedo || isSaving || isPendingState || isRestoringFromHistory) ? 'none' : 'auto'
+                          }}
+                        >
+                          <span>↷</span>
+                        </button>
+                      </div>
+                    )}
+
                     {((String(isEditableProject) === 'true') || 
                       ( currentLayout === 'myprojects' && isCloned))  && (
                       <SB3Downloader>
@@ -702,6 +789,12 @@ const mapStateToProps = (state) => ({
   isCloned: state.scratchGui.vmStatus.isCloned,
   notifications: state.scratchGui.vmStatus.notifications,
   currentLayout: state.scratchGui.vmStatus.currentLayout,
+  // History state
+  projectHistory: state.scratchGui.vmStatus.projectHistory,
+  historyIndex: state.scratchGui.vmStatus.historyIndex,
+  canUndo: state.scratchGui.vmStatus.canUndo,
+  canRedo: state.scratchGui.vmStatus.canRedo,
+  isRestoringFromHistory: state.scratchGui.vmStatus.isRestoringFromHistory,
 })
 
 const mapDispatchToProps = {
@@ -711,6 +804,9 @@ const mapDispatchToProps = {
   setProjectName,
   setPositionModal,
   setCurrentLayout,
+  undoProject,
+  redoProject,
+  updateHistoryNavigation,
 }
 
 export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(GUIComponent))

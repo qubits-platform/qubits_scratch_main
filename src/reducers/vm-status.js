@@ -22,6 +22,12 @@ const POSITION_MODAL = "scratch-gui/vm-status/POSITION_MODAL";
 const SET_ISEDITABLE_PROJECT = "scratch-gui/vm-status/SET_ISEDITABLE_PROJECT";
 const SET_IS_CLONED = "scratch-gui/vm-status/SET_IS_CLONED";
 const SET_CURRENT_LAYOUT = "scratch-gui/vm-status/SET_CURRENT_LAYOUT";
+const ADD_TO_PROJECT_HISTORY = "scratch-gui/vm-status/ADD_TO_PROJECT_HISTORY";
+const UNDO_PROJECT = "scratch-gui/vm-status/UNDO_PROJECT";
+const REDO_PROJECT = "scratch-gui/vm-status/REDO_PROJECT";
+const UPDATE_HISTORY_NAVIGATION =
+    "scratch-gui/vm-status/UPDATE_HISTORY_NAVIGATION";
+const CLEAR_PROJECT_HISTORY = "scratch-gui/vm-status/CLEAR_PROJECT_HISTORY";
 
 const initialState = {
     running: false,
@@ -44,6 +50,12 @@ const initialState = {
     isEditableProject: null,
     isCloned: null,
     currentLayout: "studentChallenge",
+    projectHistory: [],
+    historyIndex: -1,
+    maxHistorySize: 5,
+    canUndo: false,
+    canRedo: false,
+    isRestoringFromHistory: false,
 };
 
 const reducer = function (state, action) {
@@ -141,6 +153,69 @@ const reducer = function (state, action) {
             return {
                 ...state,
                 currentLayout: action.currentLayout,
+            };
+        case ADD_TO_PROJECT_HISTORY:
+            const newHistory = [...state.projectHistory];
+            const newIndex = state.historyIndex + 1;
+
+            // Remove any future history if we're not at the end
+            newHistory.splice(newIndex);
+
+            // Add new state to history
+            newHistory.push(action.historyItem);
+
+            // Maintain max history size
+            if (newHistory.length > state.maxHistorySize) {
+                newHistory.shift();
+            }
+
+            const finalIndex = newHistory.length - 1;
+
+            return {
+                ...state,
+                projectHistory: newHistory,
+                historyIndex: finalIndex,
+                canUndo: finalIndex > 0,
+                canRedo: false,
+            };
+        case UNDO_PROJECT:
+            if (state.historyIndex <= 0) return state;
+
+            const undoIndex = state.historyIndex - 1;
+            return {
+                ...state,
+                historyIndex: undoIndex,
+                canUndo: undoIndex > 0,
+                canRedo: true,
+                isRestoringFromHistory: true,
+            };
+        case REDO_PROJECT:
+            if (state.historyIndex >= state.projectHistory.length - 1)
+                return state;
+
+            const redoIndex = state.historyIndex + 1;
+            return {
+                ...state,
+                historyIndex: redoIndex,
+                canUndo: true,
+                canRedo: redoIndex < state.projectHistory.length - 1,
+                isRestoringFromHistory: true,
+            };
+        case UPDATE_HISTORY_NAVIGATION:
+            return {
+                ...state,
+                canUndo: action.canUndo,
+                canRedo: action.canRedo,
+                isRestoringFromHistory: action.isRestoringFromHistory || false,
+            };
+        case CLEAR_PROJECT_HISTORY:
+            return {
+                ...state,
+                projectHistory: [],
+                historyIndex: -1,
+                canUndo: false,
+                canRedo: false,
+                isRestoringFromHistory: false,
             };
         default:
             return state;
@@ -296,6 +371,44 @@ const setCurrentLayout = function (currentLayout) {
     };
 };
 
+const addToProjectHistory = function (historyItem) {
+    return {
+        type: ADD_TO_PROJECT_HISTORY,
+        historyItem: historyItem,
+    };
+};
+
+const undoProject = function () {
+    return {
+        type: UNDO_PROJECT,
+    };
+};
+
+const redoProject = function () {
+    return {
+        type: REDO_PROJECT,
+    };
+};
+
+const updateHistoryNavigation = function (
+    canUndo,
+    canRedo,
+    isRestoringFromHistory
+) {
+    return {
+        type: UPDATE_HISTORY_NAVIGATION,
+        canUndo: canUndo,
+        canRedo: canRedo,
+        isRestoringFromHistory: isRestoringFromHistory,
+    };
+};
+
+const clearProjectHistory = function () {
+    return {
+        type: CLEAR_PROJECT_HISTORY,
+    };
+};
+
 export {
     reducer as default,
     initialState as vmStatusInitialState,
@@ -320,4 +433,9 @@ export {
     setIsEditable,
     setIsCloned,
     setCurrentLayout,
+    addToProjectHistory,
+    undoProject,
+    redoProject,
+    updateHistoryNavigation,
+    clearProjectHistory,
 };

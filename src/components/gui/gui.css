@@ -127,6 +127,56 @@ html, body {
     filter: brightness(0.8);
     transition: filter 0.2s ease;
 }
+
+.history-controls {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.undo-button,
+.redo-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #E0E0E0;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 4px 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.2s ease;
+    min-width: 24px;
+    height: 24px;
+}
+
+.undo-button:hover:not(:disabled),
+.redo-button:hover:not(:disabled) {
+    background-color: #f5f5f5;
+    border-color: #ccc;
+    color: #333;
+}
+
+.undo-button:disabled,
+.redo-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+    background-color: #fafafa;
+}
+
+.undo-button span,
+.redo-button span {
+    font-size: 16px;
+    line-height: 1;
+    user-select: none;
+}
 .page-wrapper {
     height: 100%;
     border-radius: 0.6rem;

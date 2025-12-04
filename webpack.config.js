@@ -48,58 +48,58 @@ const baseConfig = new ScratchWebpackConfigBuilder({
                 /Module not found/,
             ],
         },
-        optimization: {
-            splitChunks: {
-                chunks: "all",
-                automaticNameDelimiter: "-",
-                cacheGroups: {
-                    vendors: {
-                        test: /[\\/]node_modules[\\/]/,
-                        name: "vendors",
-                        chunks: "all",
-                        reuseExistingChunk: true,
-                        enforce: true,
-                        priority: -10,
-                        minSize: 0,
-                        maxSize: 200 * 1024,
-                    },
-                    default: {
-                        minChunks: 2,
-                        priority: -20,
-                        reuseExistingChunk: true,
-                    },
-                },
-            },
-            mergeDuplicateChunks: true,
-            runtimeChunk: "single",
-            minimize: true,
-            minimizer: [
-                new TerserPlugin({
-                    terserOptions: {
-                        compress: {
-                            drop_console: true,
-                            drop_debugger: true,
-                            dead_code: true,
-                            passes: 2,
-                            toplevel: true,
-                            warnings: false,
-                            pure_funcs: [
-                                "console.log",
-                                "console.warn",
-                                "console.info",
-                            ],
-                        },
-                        output: {
-                            comments: false,
-                        },
-                        mangle: {
-                            safari10: true,
-                        },
-                    },
-                    extractComments: false,
-                }),
-            ],
-        },
+        // optimization: {
+        //     splitChunks: {
+        //         chunks: "all",
+        //         automaticNameDelimiter: "-",
+        //         cacheGroups: {
+        //             vendors: {
+        //                 test: /[\\/]node_modules[\\/]/,
+        //                 name: "vendors",
+        //                 chunks: "all",
+        //                 reuseExistingChunk: true,
+        //                 enforce: true,
+        //                 priority: -10,
+        //                 minSize: 0,
+        //                 maxSize: 200 * 1024,
+        //             },
+        //             default: {
+        //                 minChunks: 2,
+        //                 priority: -20,
+        //                 reuseExistingChunk: true,
+        //             },
+        //         },
+        //     },
+        //     mergeDuplicateChunks: true,
+        //     runtimeChunk: "single",
+        //     minimize: true,
+        //     minimizer: [
+        //         new TerserPlugin({
+        //             terserOptions: {
+        //                 compress: {
+        //                     drop_console: true,
+        //                     drop_debugger: true,
+        //                     dead_code: true,
+        //                     passes: 2,
+        //                     toplevel: true,
+        //                     warnings: false,
+        //                     pure_funcs: [
+        //                         "console.log",
+        //                         "console.warn",
+        //                         "console.info",
+        //                     ],
+        //                 },
+        //                 output: {
+        //                     comments: false,
+        //                 },
+        //                 mangle: {
+        //                     safari10: true,
+        //                 },
+        //             },
+        //             extractComments: false,
+        //         }),
+        //     ],
+        // },
     })
     .addModuleRule({
         test: /\.css$/,

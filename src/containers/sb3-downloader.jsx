@@ -5,8 +5,9 @@ import { connect } from 'react-redux'
 import { projectTitleInitialState } from '../reducers/project-title'
 import downloadBlob from '../lib/download-blob'
 import localforage from 'localforage'
-import { setIsSavingState, setIsScratchData, setIsSavingStateStatus, setIsPendingState, setProjectName, addNotification } from './../reducers/vm-status.js'
+import { setIsSavingState, setIsScratchData, setIsSavingStateStatus, setIsPendingState, setProjectName, addNotification, addToProjectHistory } from './../reducers/vm-status.js'
 import { validateProjectFromBase64 } from '../lib/project-validator'
+import { createHistoryItem, isValidForHistory } from '../lib/project-history-utils.js'
 /**
  * Project saver component passes a downloadProject function to its child.
  * It expects this child to be a function with the signature
@@ -27,8 +28,31 @@ class SB3Downloader extends React.Component {
     this.abortController = null
     this.debounceTimeout = null
     this.previousBase64 = null
-    bindAll(this, ['downloadProject', 'downloadLocalStorageProject'])
+    this.backupProjectState = null
+    bindAll(this, ['downloadProject', 'downloadLocalStorageProject', 'restoreBackupProject'])
   }
+
+  async restoreBackupProject() {
+      try {
+            let binaryString = atob(this.backupProjectState)
+            let bytes = new Uint8Array(binaryString.length)
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i)
+            }
+            await new Promise((resolve) => setTimeout(resolve, 500))
+            await this.props.vm.loadProject(bytes.buffer)
+        } catch (error) {
+            console.error('Error restoring project from backup:', error)
+            this.props.addNotification({
+              type: 'error',
+              icon: 'error',
+              message: 'Failed to load the project, please reload the page.',
+              duration: 5000
+            })
+            reject(error)
+        }
+  }
+
   downloadProject() {
     this.props.saveProjectSb3().then((content) => {
       if (this.props.onSaveFinished) {
@@ -50,7 +74,6 @@ class SB3Downloader extends React.Component {
         return
       }
        if (String(this.props.isEditableProject) === 'false' && !this.props.isCloned) {
-        console.log('Project is not editable, skipping save')
         return
       }
       if (this.debounceTimeout) {
@@ -86,6 +109,24 @@ class SB3Downloader extends React.Component {
             if (this.previousBase64 === base64blocks) {
               return
             }
+            
+            const WARNING_THRESHOLD = 56000;
+            
+            if (base64blocks.length <= WARNING_THRESHOLD) {
+                const userChoice = window.confirm(
+                    `Warning: This might indicate the project is empty or missing data.\n\n` +
+                    `Do you want to continue saving this project?\n\n` +
+                    `Click "OK" to continue saving or "Cancel" to restore to previous state.`
+                );
+                
+                if (!userChoice) {
+                    this.props.setIsPendingState(false);
+                    await this.restoreBackupProject();
+                    return;
+                }
+                
+            }
+
             this.previousBase64 = base64blocks
 
             if (typeof base64blocks === 'string') {
@@ -138,7 +179,15 @@ class SB3Downloader extends React.Component {
                 const errorText = await response.text()
                 throw new Error(`HTTP ${response.status}: ${errorText || 'Unknown error'}`)
               }
-              
+
+               this.backupProjectState = base64blocks
+
+              // Add to project history ONLY after successful API call
+              if (isValidForHistory(base64blocks)) {
+                const historyItem = createHistoryItem(base64blocks, this.props.projectName);
+                this.props.addToProjectHistory(historyItem);
+              }
+
               this.props.addNotification({
                 type: 'success',
                 icon: 'success',
@@ -251,6 +300,7 @@ const mapStateToProps = (state) => ({
   projectName: state.scratchGui.vmStatus.projectName,
   isEditableProject: state.scratchGui.vmStatus.isEditableProject,
   isCloned: state.scratchGui.vmStatus.isCloned,
+  vm: state.scratchGui.vm,
 })
 
 const mapDispatchToProps = {
@@ -260,6 +310,7 @@ const mapDispatchToProps = {
   setIsPendingState,
   setProjectName,
   addNotification,
+  addToProjectHistory,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SB3Downloader)
