@@ -299,6 +299,7 @@ class MenuBarGuiSub extends React.Component {
       
       // Push the initial project state to history for myprojects layout
       if (data.content) {
+        console.log('pushing project to history after fetch')
         this.props.pushProjectHistory(data.content);
       }
       

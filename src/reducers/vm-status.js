@@ -27,6 +27,8 @@ const UNDO_HISTORY = "scratch-gui/vm-status/UNDO_HISTORY";
 const REDO_HISTORY = "scratch-gui/vm-status/REDO_HISTORY";
 const SET_MY_PROJECTS_GET_PENDING =
     "scratch-gui/vm-status/SET_MY_PROJECTS_GET_PENDING";
+const SET_IS_RESTORING_FROM_HISTORY =
+    "scratch-gui/vm-status/SET_IS_RESTORING_FROM_HISTORY";
 
 const initialState = {
     running: false,
@@ -52,6 +54,7 @@ const initialState = {
     projectHistory: [],
     currentHistoryIndex: 0,
     isMyProjectsGetPending: false,
+    isRestoringFromHistory: false,
 };
 
 const reducer = function (state, action) {
@@ -176,6 +179,11 @@ const reducer = function (state, action) {
             return {
                 ...state,
                 isMyProjectsGetPending: action.isMyProjectsGetPending,
+            };
+        case SET_IS_RESTORING_FROM_HISTORY:
+            return {
+                ...state,
+                isRestoringFromHistory: action.isRestoringFromHistory,
             };
         default:
             return state;
@@ -357,6 +365,13 @@ const setMyProjectsGetPending = function (isMyProjectsGetPending) {
     };
 };
 
+const setIsRestoringFromHistory = function (isRestoringFromHistory) {
+    return {
+        type: SET_IS_RESTORING_FROM_HISTORY,
+        isRestoringFromHistory: isRestoringFromHistory,
+    };
+};
+
 export {
     reducer as default,
     initialState as vmStatusInitialState,
@@ -385,4 +400,5 @@ export {
     undoHistory,
     redoHistory,
     setMyProjectsGetPending,
+    setIsRestoringFromHistory,
 };

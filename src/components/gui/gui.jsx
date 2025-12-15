@@ -58,6 +58,7 @@ import {
   undoHistory,
   redoHistory,
   setMyProjectsGetPending,
+  setIsRestoringFromHistory,
 } from './../../reducers/vm-status.js'
 import LanguageMenu from '../menu-bar/language-menu.jsx'
 import localforage from 'localforage'
@@ -167,17 +168,19 @@ const GUIComponent = (props) => {
     notifications,
     isEditableProject,
     isCloned,
-    currentLayout,
+    // currentLayout,
     projectHistory,
     currentHistoryIndex,
     undoHistory,
     redoHistory,
+    isRestoringFromHistory,
+
     ...componentProps
   } = omit(props, 'dispatch')
   if (children) {
     return <Box {...componentProps}>{children}</Box>
   }
-
+  const currentLayout = 'studentChallenge' 
   const tabClassNames = {
     tabs: styles.tabs,
     tab: classNames(tabStyles.reactTabsTab, styles.tab),
@@ -192,6 +195,10 @@ const GUIComponent = (props) => {
   }
   const [remote, setRemote] = React.useState(null)
   const [connection, setConnection] = React.useState(null)
+
+  useEffect(() => {
+    console.log('isRestoringFromHistory ', isRestoringFromHistory);
+  }, [isRestoringFromHistory])
 
 
   useEffect(() => {
@@ -281,7 +288,8 @@ const GUIComponent = (props) => {
       
       await new Promise((resolve) => setTimeout(resolve, 500));
       await vm.loadProject(bytes.buffer);
-      
+      console.log('setting it to false')
+      setIsRestoringFromHistory(false);
     } catch (error) {
       console.error('Failed to load project from history:', error);
       addNotification({
@@ -302,6 +310,8 @@ const GUIComponent = (props) => {
     }
     
     const newIndex = Math.min(currentHistoryIndex + 1, projectHistory.length - 1);
+    console.log('seeting the flag to true')
+    props.setIsRestoringFromHistory(true);
     
     undoHistory(); // Update Redux state
     
@@ -316,8 +326,11 @@ const GUIComponent = (props) => {
     if (projectHistory.length === 0 || currentHistoryIndex <= 0) {
       return;
     }
-    
+    console.log('setting the flag to true redo');
     const newIndex = Math.max(currentHistoryIndex - 1, 0);
+    
+    // Set flag to prevent auto-save during restoration
+    props.setIsRestoringFromHistory(true);
     
     redoHistory(); // Update Redux state
     
@@ -468,6 +481,40 @@ const GUIComponent = (props) => {
                 </div>
               )}
 
+              {currentLayout === 'studentChallenge' && (
+                      <div className={styles.historyButtons} style={{ marginLeft: '10rem' }}>
+                        <button
+                          className={styles.undoIcon}
+                          onClick={handleUndo}
+                          disabled={projectHistory.length === 0 || currentHistoryIndex >= projectHistory.length - 1}
+                          title={
+                            projectHistory.length === 0 
+                              ? 'No history available'
+                              : currentHistoryIndex >= projectHistory.length - 1
+                                ? 'No more actions to undo'
+                                : `Undo to last saved data`
+                          }
+                        >
+                            <img src={UndoButton} />
+                        </button>
+                        <button
+                          className={styles.redoIcon}
+                          onClick={handleRedo}
+                          disabled={projectHistory.length === 0 || currentHistoryIndex <= 0}
+
+                          title={
+                            projectHistory.length === 0
+                              ? 'No history available'  
+                              : currentHistoryIndex <= 0
+                                ? 'No more actions to redo'
+                                : `Redo to last saved data`
+                          }
+                        >
+                          <img src={RedoButton} />
+                        </button>
+                      </div>
+                     )}
+
               <div
                 className={
                   currentLayout === 'myprojects' ? styles.topNavIcons : styles.topNavIconsLeft
@@ -490,7 +537,39 @@ const GUIComponent = (props) => {
                 <div className={styles.languageRes}>
                   <LanguageMenu />
                 </div>
-
+                   {/* <MenuBar
+                    accountNavOpen={accountNavOpen}
+                    authorId={authorId}
+                    authorThumbnailUrl={authorThumbnailUrl}
+                    authorUsername={authorUsername}
+                    canChangeLanguage={canChangeLanguage}
+                    canChangeTheme={canChangeTheme}
+                    canCreateCopy={canCreateCopy}
+                    canCreateNew={canCreateNew}
+                    canEditTitle={canEditTitle}
+                    canManageFiles={canManageFiles}
+                    canRemix={canRemix}
+                    canSave={canSave}
+                    canShare={canShare}
+                    className={styles.menuBarPosition}
+                    enableCommunity={enableCommunity}
+                    isShared={isShared}
+                    isTotallyNormal={isTotallyNormal}
+                    logo={logo}
+                    renderLogin={renderLogin}
+                    showComingSoon={showComingSoon}
+                    onClickAbout={onClickAbout}
+                    onClickAccountNav={onClickAccountNav}
+                    onClickLogo={onClickLogo}
+                    onCloseAccountNav={onCloseAccountNav}
+                    onLogOut={onLogOut}
+                    onOpenRegistration={onOpenRegistration}
+                    onProjectTelemetryEvent={onProjectTelemetryEvent}
+                    onSeeCommunity={onSeeCommunity}
+                    onShare={onShare}
+                    onStartSelectingFileUpload={onStartSelectingFileUpload}
+                    onToggleLoginOpen={onToggleLoginOpen}
+                /> */}
                 <div className={styles.settingIcon}>
                   <MenuBarGuiSub
                     accountNavOpen={accountNavOpen}
@@ -813,6 +892,7 @@ const mapStateToProps = (state) => ({
   currentLayout: state.scratchGui.vmStatus.currentLayout,
   projectHistory: state.scratchGui.vmStatus.projectHistory,
   currentHistoryIndex: state.scratchGui.vmStatus.currentHistoryIndex,
+  isRestoringFromHistory: state.scratchGui.vmStatus.isRestoringFromHistory,
 })
 
 const mapDispatchToProps = {
@@ -826,6 +906,7 @@ const mapDispatchToProps = {
   undoHistory,
   redoHistory,
   setMyProjectsGetPending,
+  setIsRestoringFromHistory,
 }
 
 export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(GUIComponent))

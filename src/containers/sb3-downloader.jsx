@@ -137,8 +137,6 @@ class SB3Downloader extends React.Component {
                 signal,
               })
 
-               this.props.pushProjectHistory(base64blocks)
-              
               if (!response.ok) {
                 const errorText = await response.text()
                 throw new Error(`HTTP ${response.status}: ${errorText || 'Unknown error'}`)
@@ -194,36 +192,62 @@ class SB3Downloader extends React.Component {
         })
       }, 5000)
     } else {
-      this.props.saveProjectSb3().then((content) => {
-        if (this.props.onSaveFinished) {
-          this.props.onSaveFinished()
-        }
-        const reader = new FileReader()
-        reader.onloadend = async () => {
-          const buffer = reader.result
-          const binaryString = Array.prototype.map
-            .call(new Uint8Array(buffer), (x) => String.fromCharCode(x))
-            .join('')
-          let base64blocks = btoa(
-            new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''),
-          )
-          this.props.setIsScratchData(base64blocks)
-          setTimeout(() => {
-            this.props.saveProjectSb3().then((freshContent) => {
-              const freshReader = new FileReader()
-              freshReader.onloadend = async () => {
-                const freshBuffer = freshReader.result
-                let freshBase64blocks = btoa(
-                  new Uint8Array(freshBuffer).reduce((data, byte) => data + String.fromCharCode(byte), ''),
-                )
-                this.props.setIsScratchData(freshBase64blocks)
+      // Add debouncing for the else block to prevent excessive calls
+      if (this.debounceTimeout) {
+        clearTimeout(this.debounceTimeout)
+      }
+      
+      this.debounceTimeout = setTimeout(() => {
+        this.props.saveProjectSb3().then((content) => {
+          if (this.props.onSaveFinished) {
+            this.props.onSaveFinished()
+          }
+          const url = new URLSearchParams(window.location.search)
+          const inputLayout = 'studentChallenge'
+
+          const reader = new FileReader()
+          reader.onloadend = async () => {
+            const buffer = reader.result
+            const binaryString = Array.prototype.map
+              .call(new Uint8Array(buffer), (x) => String.fromCharCode(x))
+              .join('')
+            let base64blocks = btoa(
+              new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''),
+            )
+            
+            // Add deduplication logic - only push to history if content changed
+            if (this.previousBase64 === base64blocks) {
+              return
+            }
+            
+            this.props.setIsScratchData(base64blocks)
+            if(inputLayout === 'studentChallenge') {
+              console.log('skipping',this.props.isRestoringFromHistory) 
+              if(this.props.isRestoringFromHistory) {
+                return
               }
-              freshReader.readAsArrayBuffer(freshContent)
-            })
-          }, 50)
-        }
-        reader.readAsArrayBuffer(content)
-      })
+              console.log('skipping skipped')
+              this.props.pushProjectHistory(base64blocks)
+              this.previousBase64 = base64blocks
+            }
+            
+            setTimeout(() => {
+              this.props.saveProjectSb3().then((freshContent) => {
+                const freshReader = new FileReader()
+                freshReader.onloadend = async () => {
+                  const freshBuffer = freshReader.result
+                  let freshBase64blocks = btoa(
+                    new Uint8Array(freshBuffer).reduce((data, byte) => data + String.fromCharCode(byte), ''),
+                  )
+                  this.props.setIsScratchData(freshBase64blocks)
+                }
+                freshReader.readAsArrayBuffer(freshContent)
+              })
+            }, 50)
+          }
+          reader.readAsArrayBuffer(content)
+        })
+      }, 1000) // Add 1 second debounce similar to menu-bar debouncing
     }
   }
 
@@ -260,6 +284,7 @@ const mapStateToProps = (state) => ({
   isEditableProject: state.scratchGui.vmStatus.isEditableProject,
   isCloned: state.scratchGui.vmStatus.isCloned,
   isMyProjectsGetPending: state.scratchGui.vmStatus.isMyProjectsGetPending,
+  isRestoringFromHistory: state.scratchGui.vmStatus.isRestoringFromHistory,
 })
 
 const mapDispatchToProps = {
