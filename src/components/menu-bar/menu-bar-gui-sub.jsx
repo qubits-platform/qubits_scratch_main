@@ -106,6 +106,7 @@ class MenuBarGuiSub extends React.Component {
     this.state = {
       projectName: null,
       downloadLocalStorageProject: null,
+      setInitialBase64: null,
       currentLayout: null,
     }
     bindAll(this, [
@@ -122,6 +123,7 @@ class MenuBarGuiSub extends React.Component {
       'restoreOptionMessage',
       'onLocalStorageFileUploadFromBlob',
       'handleDownloadLocalStorageProject',
+      'handleSetInitialBase64',
       'handleReload',
     ])
   }
@@ -134,6 +136,13 @@ class MenuBarGuiSub extends React.Component {
     // Only update the state if downloadLocalStorageProject has changed
     if (this.state.downloadLocalStorageProject !== downloadLocalStorageProject) {
       this.setState({ downloadLocalStorageProject })
+    }
+  }
+
+  handleSetInitialBase64 = (setInitialBase64) => {
+    // Store the setInitialBase64 function for later use
+    if (this.state.setInitialBase64 !== setInitialBase64) {
+      this.setState({ setInitialBase64 })
     }
   }
 
@@ -538,6 +547,10 @@ class MenuBarGuiSub extends React.Component {
         this.onLocalStorageFileUploadTeacher(result)
       } else if (currentLayout === 'myprojects') {
         result = await this.fetchProjectData(projectId, fetchapiurl)
+        // Pre-initialize previousBase64 with fetched data to prevent redundant saves
+        if (this.state.setInitialBase64 && result.content) {
+          this.state.setInitialBase64(result.content)
+        }
         this.onLocalStorageFileUploadStudentmyproject(result.content)
       } else if (currentLayout === 'chapter') {
         result = await this.fetchChpaterData(scratchUrl, fetchapiurl)
@@ -599,11 +612,18 @@ class MenuBarGuiSub extends React.Component {
     }
     await new Promise((resolve) => setTimeout(resolve, 500))
     await this.props.vm.loadProject(bytes.buffer)
+    
   } catch (error) {
     console.error('Error loading project:', error)
     // Handle error appropriately
   } finally {
-    this.props.setMyProjectsGetPending(false);
+    // Extended grace period: Keep protection active for 3 seconds after VM load
+    // This allows the VM to fully stabilize and prevents early auto-saves
+    setTimeout(() => {
+      this.props.setMyProjectsGetPending(false);
+    }, 3000);
+    
+    // Clear isFirst immediately as a secondary guard
     this.props.onClickFirstFalse()
   }
 }
@@ -773,8 +793,9 @@ class MenuBarGuiSub extends React.Component {
           >
             <div style={{ display: 'none' }}>
               <SB3Downloader>
-                {(className, downloadProjectCallback, downloadLocalStorageProject) => {
+                {(className, downloadProjectCallback, downloadLocalStorageProject, setInitialBase64) => {
                   this.handleDownloadLocalStorageProject(downloadLocalStorageProject)
+                  this.handleSetInitialBase64(setInitialBase64)
                   return (
                     <div
                       className={className}
