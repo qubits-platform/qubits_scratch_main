@@ -27,7 +27,16 @@ class SB3Downloader extends React.Component {
     this.abortController = null
     this.debounceTimeout = null
     this.previousBase64 = null
-    bindAll(this, ['downloadProject', 'downloadLocalStorageProject'])
+    this.pageLoadTime = Date.now() // Track when component mounted to prevent early saves
+    bindAll(this, ['downloadProject', 'downloadLocalStorageProject', 'setInitialBase64'])
+  }
+  
+  // Method to pre-initialize previousBase64 with fetched data
+  // This prevents the first auto-save from triggering with the same data
+  setInitialBase64(base64Data) {
+    if (base64Data && !this.previousBase64) {
+      this.previousBase64 = base64Data;
+    }
   }
   downloadProject() {
     this.props.saveProjectSb3().then((content) => {
@@ -45,15 +54,24 @@ class SB3Downloader extends React.Component {
     const fetchapiurl = url.get('fetchapiurl');
 
     if (inputLayout === 'myprojects') {
+      // Layer 1: Check if initial project fetch is still pending
       if (this.props.isMyProjectsGetPending) {
-   
         return;
       }
       
+      // Layer 2: Check if this is the first load
       if (this.props.isFirst) {
+        console.log('[Save Guard] Blocking save - first load not complete');
         return
       }
-       if (String(this.props.isEditableProject) === 'false' && !this.props.isCloned) {
+      
+      // Layer 3: Time-based protection - reject saves within first 15 seconds of page load
+      const timeSincePageLoad = Date.now() - this.pageLoadTime;
+      if (timeSincePageLoad < 15000) {
+        return;
+      }
+      
+      if (String(this.props.isEditableProject) === 'false' && !this.props.isCloned) {
         return
       }
       if (this.debounceTimeout) {
@@ -84,15 +102,29 @@ class SB3Downloader extends React.Component {
               new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''),
             )
 
-            // Note: Validation is handled by validateProjectFromBase64 below
-
+            // Layer 4: Check if data is identical to previous save (duplicate prevention)
             if (this.previousBase64 === base64blocks) {
               return
             }
-            this.previousBase64 = base64blocks
 
+            // Layer 5: Size validation - reject suspiciously small projects (< 200 bytes likely empty)
             if (typeof base64blocks === 'string') {
-              const base64Size = (base64blocks.length * 3) / 4 - (base64blocks.endsWith('==') ? 2 : base64blocks.endsWith('=') ? 1 : 0);  
+              const base64Size = (base64blocks.length * 3) / 4 - (base64blocks.endsWith('==') ? 2 : base64blocks.endsWith('=') ? 1 : 0);
+              
+              // Check minimum size to prevent saving empty/default projects
+              if (base64Size < 200) {
+                console.error('[Save Guard] Blocking save - project too small (likely empty):', base64Size, 'bytes');
+                this.props.setIsPendingState(false);
+                this.props.addNotification({
+                  type: 'error',
+                  icon: 'error',
+                  message: 'Cannot save: Project data appears to be empty or corrupted.',
+                  duration: 5000
+                });
+                return;
+              }
+              
+              // Check maximum size limit
               if (base64Size > 10 * 1024 * 1024) {
                 this.props.setIsPendingState(false)
                 this.props.addNotification({
@@ -104,6 +136,9 @@ class SB3Downloader extends React.Component {
                 return 
               }
             }
+            
+            // Update previousBase64 after all validations pass
+            this.previousBase64 = base64blocks
 
             const structure = {
               name: this.props.projectName,
@@ -229,7 +264,12 @@ class SB3Downloader extends React.Component {
 
   render() {
     const { children } = this.props
-    return children(this.props.className, this.downloadProject, this.downloadLocalStorageProject)
+    return children(
+      this.props.className,
+      this.downloadProject,
+      this.downloadLocalStorageProject,
+      this.setInitialBase64  // Expose method to pre-initialize previousBase64
+    )
   }
 }
 
