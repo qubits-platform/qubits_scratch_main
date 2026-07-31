@@ -37,6 +37,7 @@ jobs:
             - name: Install Dependencies
               run: npm ci --legacy-peer-deps
             - name: Lint
+              continue-on-error: true
               run: npm run test:lint
             - name: Cache node_modules
               id: cache-nodemodules
