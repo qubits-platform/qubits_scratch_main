@@ -12,13 +12,30 @@
  * 5. Call analyzeRenders() to see the analysis
  */
 
+/* eslint-env browser */
+
 // Global variables to track renders
 window.renderTracker = {
     logs: [],
     startTime: Date.now(),
     componentCounts: {},
     lastRenderTimes: {},
-    suspiciousPatterns: [],
+    suspiciousPatterns: []
+};
+
+/**
+ * Map a render log message to the name of the component that emitted it.
+ * @param {string} message The logged message.
+ * @returns {string} The component name, or 'Unknown' if unrecognized.
+ */
+const extractComponentName = function (message) {
+    if (message.includes('🔄 GUIComponent')) return 'GUIComponent';
+    if (message.includes('🧱 Blocks')) return 'Blocks';
+    if (message.includes('🎭 StageWrapperComponent')) {
+        return 'StageWrapperComponent';
+    }
+    if (message.includes('🎯 TargetPane')) return 'TargetPane';
+    return 'Unknown';
 };
 
 // Override console.log to capture our render logs
@@ -30,18 +47,18 @@ console.log = function (...args) {
     // Check if this is one of our render logs
     const message = args[0];
     if (
-        typeof message === "string" &&
-        (message.includes("🔄 GUIComponent RENDER:") ||
-            message.includes("🧱 Blocks") ||
-            message.includes("🎭 StageWrapperComponent RENDER:") ||
-            message.includes("🎯 TargetPane"))
+        typeof message === 'string' &&
+        (message.includes('🔄 GUIComponent RENDER:') ||
+            message.includes('🧱 Blocks') ||
+            message.includes('🎭 StageWrapperComponent RENDER:') ||
+            message.includes('🎯 TargetPane'))
     ) {
         const timestamp = Date.now();
         const logEntry = {
             timestamp,
             message,
             data: args[1] || {},
-            component: extractComponentName(message),
+            component: extractComponentName(message)
         };
 
         window.renderTracker.logs.push(logEntry);
@@ -61,7 +78,7 @@ console.log = function (...args) {
                     component,
                     timeDiff,
                     timestamp,
-                    message: `Rapid re-render detected: ${component} rendered ${timeDiff}ms after previous render`,
+                    message: `Rapid re-render detected: ${component} rendered ${timeDiff}ms after previous render`
                 });
             }
         }
@@ -69,25 +86,16 @@ console.log = function (...args) {
     }
 };
 
-function extractComponentName(message) {
-    if (message.includes("🔄 GUIComponent")) return "GUIComponent";
-    if (message.includes("🧱 Blocks")) return "Blocks";
-    if (message.includes("🎭 StageWrapperComponent"))
-        return "StageWrapperComponent";
-    if (message.includes("🎯 TargetPane")) return "TargetPane";
-    return "Unknown";
-}
-
 // Analysis functions
 window.analyzeRenders = function () {
     const tracker = window.renderTracker;
     const totalTime = Date.now() - tracker.startTime;
 
-    console.group("🔍 RENDER ANALYSIS REPORT");
+    console.group('🔍 RENDER ANALYSIS REPORT');
     console.log(`📊 Analysis Period: ${(totalTime / 1000).toFixed(2)} seconds`);
     console.log(`📝 Total Render Logs: ${tracker.logs.length}`);
 
-    console.group("📈 Component Render Counts");
+    console.group('📈 Component Render Counts');
     Object.entries(tracker.componentCounts)
         .sort(([, a], [, b]) => b - a)
         .forEach(([component, count]) => {
@@ -97,17 +105,17 @@ window.analyzeRenders = function () {
     console.groupEnd();
 
     if (tracker.suspiciousPatterns.length > 0) {
-        console.group("⚠️ SUSPICIOUS PATTERNS (Potential Infinite Renders)");
-        tracker.suspiciousPatterns.forEach((pattern) => {
+        console.group('⚠️ SUSPICIOUS PATTERNS (Potential Infinite Renders)');
+        tracker.suspiciousPatterns.forEach(pattern => {
             console.warn(pattern.message);
         });
         console.groupEnd();
     } else {
-        console.log("✅ No suspicious rapid re-render patterns detected");
+        console.log('✅ No suspicious rapid re-render patterns detected');
     }
 
-    console.group("🕐 Recent Renders (Last 10)");
-    tracker.logs.slice(-10).forEach((log) => {
+    console.group('🕐 Recent Renders (Last 10)');
+    tracker.logs.slice(-10).forEach(log => {
         const timeFromStart = (
             (log.timestamp - tracker.startTime) /
             1000
@@ -122,7 +130,7 @@ window.analyzeRenders = function () {
         totalRenders: tracker.logs.length,
         componentCounts: tracker.componentCounts,
         suspiciousPatterns: tracker.suspiciousPatterns,
-        analysisTime: totalTime,
+        analysisTime: totalTime
     };
 };
 
@@ -132,51 +140,51 @@ window.clearRenderTracking = function () {
         startTime: Date.now(),
         componentCounts: {},
         lastRenderTimes: {},
-        suspiciousPatterns: [],
+        suspiciousPatterns: []
     };
-    console.log("🧹 Render tracking data cleared");
+    console.log('🧹 Render tracking data cleared');
 };
 
 window.getRendersByComponent = function (componentName) {
     return window.renderTracker.logs.filter(
-        (log) => log.component === componentName
+        log => log.component === componentName
     );
 };
 
 window.getRecentRenders = function (seconds = 10) {
-    const cutoff = Date.now() - seconds * 1000;
-    return window.renderTracker.logs.filter((log) => log.timestamp > cutoff);
+    const cutoff = Date.now() - (seconds * 1000);
+    return window.renderTracker.logs.filter(log => log.timestamp > cutoff);
 };
 
 // Utility function to detect useEffect dependency issues
 window.detectDependencyIssues = function () {
     const recentLogs = window.getRecentRenders(30);
     const guiRenders = recentLogs.filter(
-        (log) => log.component === "GUIComponent"
+        log => log.component === 'GUIComponent'
     );
 
-    console.group("🔍 DEPENDENCY ANALYSIS");
+    console.group('🔍 DEPENDENCY ANALYSIS');
 
     if (guiRenders.length > 5) {
         console.warn(
             `⚠️ GUIComponent rendered ${guiRenders.length} times in the last 30 seconds`
         );
-        console.log("This might indicate useEffect dependency issues");
+        console.log('This might indicate useEffect dependency issues');
 
         // Check for useEffect logs
-        const useEffectLogs = recentLogs.filter((log) =>
-            log.message.includes("useEffect")
+        const useEffectLogs = recentLogs.filter(log =>
+            log.message.includes('useEffect')
         );
 
         if (useEffectLogs.length > 0) {
-            console.group("🔄 Recent useEffect executions:");
-            useEffectLogs.forEach((log) => {
+            console.group('🔄 Recent useEffect executions:');
+            useEffectLogs.forEach(log => {
                 console.log(log.message, log.data);
             });
             console.groupEnd();
         }
     } else {
-        console.log("✅ GUIComponent render frequency looks normal");
+        console.log('✅ GUIComponent render frequency looks normal');
     }
 
     console.groupEnd();
@@ -199,30 +207,30 @@ window.startAutoAnalysis = function () {
         }
     }, 30000);
 
-    console.log("🤖 Auto-analysis started (runs every 30 seconds)");
+    console.log('🤖 Auto-analysis started (runs every 30 seconds)');
 };
 
 window.stopAutoAnalysis = function () {
     if (autoAnalysisInterval) {
         clearInterval(autoAnalysisInterval);
         autoAnalysisInterval = null;
-        console.log("🛑 Auto-analysis stopped");
+        console.log('🛑 Auto-analysis stopped');
     }
 };
 
 // Initialize
-console.log("🚀 Render Analysis Debug Script Loaded!");
-console.log("Available functions:");
-console.log("  - analyzeRenders() - Show detailed analysis");
-console.log("  - clearRenderTracking() - Clear tracking data");
+console.log('🚀 Render Analysis Debug Script Loaded!');
+console.log('Available functions:');
+console.log('  - analyzeRenders() - Show detailed analysis');
+console.log('  - clearRenderTracking() - Clear tracking data');
 console.log(
-    "  - getRendersByComponent(name) - Get renders for specific component"
+    '  - getRendersByComponent(name) - Get renders for specific component'
 );
-console.log("  - getRecentRenders(seconds) - Get recent renders");
-console.log("  - detectDependencyIssues() - Check for useEffect issues");
-console.log("  - startAutoAnalysis() - Start automatic monitoring");
-console.log("  - stopAutoAnalysis() - Stop automatic monitoring");
-console.log("");
+console.log('  - getRecentRenders(seconds) - Get recent renders');
+console.log('  - detectDependencyIssues() - Check for useEffect issues');
+console.log('  - startAutoAnalysis() - Start automatic monitoring');
+console.log('  - stopAutoAnalysis() - Stop automatic monitoring');
+console.log('');
 console.log(
-    "💡 Tip: Use the application normally, then call analyzeRenders() to see the results"
+    '💡 Tip: Use the application normally, then call analyzeRenders() to see the results'
 );
