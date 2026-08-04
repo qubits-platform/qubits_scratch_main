@@ -713,7 +713,7 @@ GUIComponent.propTypes = {
   activeTabIndex: PropTypes.number,
   authorId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]), // can be false //test
   authorThumbnailUrl: PropTypes.string,
-  authorUsername: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]), // can be false
+  authorUsername: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]), // can be false //Test2
   backdropLibraryVisible: PropTypes.bool,
   backpackHost: PropTypes.string,
   backpackVisible: PropTypes.bool,
