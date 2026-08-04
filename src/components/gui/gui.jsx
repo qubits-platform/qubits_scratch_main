@@ -711,7 +711,7 @@ const GUIComponent = (props) => {
 GUIComponent.propTypes = {
   accountNavOpen: PropTypes.bool,
   activeTabIndex: PropTypes.number,
-  authorId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]), // can be false
+  authorId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]), // can be false //test
   authorThumbnailUrl: PropTypes.string,
   authorUsername: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]), // can be false
   backdropLibraryVisible: PropTypes.bool,
