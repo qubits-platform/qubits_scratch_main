@@ -328,7 +328,7 @@ export default [
     helpLink: 'https://scratch.mit.edu/vernier',
   },
   {
-    name: 'Teachable Machine gui',
+    name: 'Teachable Machine',
     extensionId: 'teachableMachine',
     iconURL: teachableMachineIconURL,
     insetIconURL: teachableMachineInsetIconURL,
