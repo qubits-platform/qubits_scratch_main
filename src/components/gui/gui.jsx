@@ -31,6 +31,7 @@ import DragLayer from '../../containers/drag-layer.jsx'
 import ConnectionModal from '../../containers/connection-modal.jsx'
 import TelemetryModal from '../telemetry-modal/telemetry-modal.jsx'
 import DeleteConfirmationModal from '../../containers/delete-confirmation-modal.jsx'
+import QubitsModelLoader from '../../containers/qubits-model-loader.jsx'
 
 import layout, { STAGE_SIZE_MODES } from '../../lib/layout-constants'
 import { resolveStageSize } from '../../lib/screen-utils'
@@ -343,6 +344,7 @@ const GUIComponent = (props) => {
             vm={vm}
           >
             {alertsVisible ? <Alerts className={styles.alertsContainer} /> : null}
+            <QubitsModelLoader vm={vm} />
           </StageWrapper>
         ) : (
           <Box className={styles.pageWrapper} dir={isRtl ? 'rtl' : 'ltr'} {...componentProps}>
@@ -359,6 +361,7 @@ const GUIComponent = (props) => {
             ) : null}
             {loading ? <Loader /> : null}
             {isCreating ? <Loader messageId='gui.loader.creating' /> : null}
+            <QubitsModelLoader vm={vm} />
             {isRendererSupported ? null : <WebGlModal isRtl={isRtl} />}
             {tipsLibraryVisible ? <TipsLibrary /> : null}
             {cardsVisible ? <Cards /> : null}
