@@ -114,6 +114,13 @@ const mainMessages = {
       id='gui.loader.creating'
     />
   ),
+  'gui.loader.model': (
+    <FormattedMessage
+      defaultMessage='Loading Model'
+      description='Main message while the project model is being loaded'
+      id='gui.loader.model'
+    />
+  ),
 }
 
 class LoaderComponent extends React.Component {
