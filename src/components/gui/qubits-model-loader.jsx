@@ -2,7 +2,9 @@ import PropTypes from 'prop-types'
 import React, { useEffect, useRef, useState } from 'react'
 import VM from 'scratch-vm'
 
-import Loader from '../components/loader/loader.jsx'
+import styles from './gui.css'
+
+import Loader from './icon--loader.svg'
 
 /**
  * Event emitted by the teachable machine extension while the project's model
@@ -39,7 +41,13 @@ const QubitsModelLoader = ({ vm }) => {
     }
   }, [vm])
 
-  return pending > 0 ? <Loader messageId='gui.loader.model' /> : null
+  return pending > 0 ? (
+    <div className={styles.modelLoaderContainer}>
+    <div className={styles.modelLoader}>
+      <img draggable={false} src={Loader} />
+    </div>
+    </div>
+  ) : null
 }
 
 QubitsModelLoader.propTypes = {

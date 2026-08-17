@@ -31,7 +31,7 @@ import DragLayer from '../../containers/drag-layer.jsx'
 import ConnectionModal from '../../containers/connection-modal.jsx'
 import TelemetryModal from '../telemetry-modal/telemetry-modal.jsx'
 import DeleteConfirmationModal from '../../containers/delete-confirmation-modal.jsx'
-import QubitsModelLoader from '../../containers/qubits-model-loader.jsx'
+import QubitsModelLoader from './qubits-model-loader.jsx'
 
 import layout, { STAGE_SIZE_MODES } from '../../lib/layout-constants'
 import { resolveStageSize } from '../../lib/screen-utils'
