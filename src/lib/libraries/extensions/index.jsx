@@ -28,6 +28,9 @@ import poseHandInsetIconUR from './poseHand/pose-hand-small-3.svg'
 import teachableMachineIconURL from './teachableMachine/teachable-machine-blocks.png'
 import teachableMachineInsetIconURL from './teachableMachine/teachable-machine-blocks-small.svg'
 
+import aiqubitaimodelIconURL from './qubitAimodel/qubit-ai-model-blocks.png'
+import aiqubitaimodelInsetIconURL from './qubitAimodel/qubit-ai-model-small.svg'
+
 import microbitIconURL from './microbit/microbit.png'
 import microbitInsetIconURL from './microbit/microbit-small.svg'
 import microbitConnectionIconURL from './microbit/microbit-illustration.svg'
@@ -346,6 +349,7 @@ export default [
     launchPeripheralConnectionFlow: false,
     useAutoScan: false,
   },
+ 
   {
     name: 'Face Sensing',
     extensionId: 'poseFace',
@@ -374,4 +378,23 @@ export default [
   ),
   featured: true
 },
+ {
+    name: 'Qubits AI Models',
+    extensionId: 'qubitsaimodel',
+    iconURL: aiqubitaimodelIconURL,
+    insetIconURL: aiqubitaimodelInsetIconURL,
+    description: (
+      <FormattedMessage
+        defaultMessage='Train and use machine learning models from qubits'
+        description="Description for the 'Qubits AI Model' extension"
+        id='gui.extension.qubitsAiModel.description'
+      />
+    ),
+    featured: true,
+    disabled: false,
+    bluetoothRequired: false,
+    internetConnectionRequired: true,
+    launchPeripheralConnectionFlow: false,
+    useAutoScan: false,
+  },
 ]
