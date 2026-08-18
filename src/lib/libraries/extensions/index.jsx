@@ -385,7 +385,7 @@ export default [
     insetIconURL: aiqubitaimodelInsetIconURL,
     description: (
       <FormattedMessage
-        defaultMessage='Train and use machine learning models from qubits'
+        defaultMessage='Explore and learn machine learning with Qubits'
         description="Description for the 'Qubits AI Model' extension"
         id='gui.extension.qubitsAiModel.description'
       />
