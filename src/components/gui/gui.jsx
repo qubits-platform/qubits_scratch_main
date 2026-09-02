@@ -402,7 +402,7 @@ const GUIComponent = (props) => {
                       <img src={Cat} />
                     </div>
 
-                    <div className={styles.projecttitleEdit}>Scratch - sadfeferfref asdreferferf asdasd asddasd nnnnn</div>
+                    <div className={styles.projecttitleEdit}>Scratch - {projectName}</div>
 
                     {((String(isEditableProject) === 'true')) && (
                       <div onClick={() => handleRemoteModal(remote)} className={styles.editIcon}>
