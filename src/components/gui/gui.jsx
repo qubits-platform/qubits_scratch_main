@@ -377,7 +377,7 @@ const GUIComponent = (props) => {
 
             <div className={styles.menuBarWithContent}>
               
-              {true && (
+              {currentLayout === 'myprojects' && (
                 <div className={styles.backAndTitle}>
                   <div className={styles.backButtonWrapper}>
                     <button
@@ -402,7 +402,7 @@ const GUIComponent = (props) => {
                       <img src={Cat} />
                     </div>
 
-                    <div className={styles.projecttitleEdit}>Scratch - {projectName}</div>
+                    <div className={styles.projecttitleEdit}>Scratch - sadfeferfref asdreferferf asdasd asddasd nnnnn</div>
 
                     {((String(isEditableProject) === 'true')) && (
                       <div onClick={() => handleRemoteModal(remote)} className={styles.editIcon}>
