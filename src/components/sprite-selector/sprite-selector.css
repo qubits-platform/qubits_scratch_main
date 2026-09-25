@@ -55,6 +55,11 @@
     overflow-y: auto;
 }
 
+.scroll-wrapper-teacher {
+    height: 14rem;
+    overflow-y: auto;
+}
+
 .scroll-wrapper-dragging {
     background-color: $drop-highlight;
 }

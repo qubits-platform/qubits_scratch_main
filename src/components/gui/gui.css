@@ -450,13 +450,16 @@ html, body {
 
 .target-wrapper-teacher{
     position: absolute;
-    width: 35vw;
-    right: 0;
-    margin-right: 2rem;
-    top: 0;
-    height: 55vh;
+    max-height: 40vh;
+    overflow-y: auto;
+    width: fit-content;
+    max-width: 30rem;
+    right: 3.7rem;
+    top: 7.6rem;
+    height: 40vh;
     margin-top: $menu-bar-height;
     z-index: 10000;
+    background-color: white;
 }
 .target-wrapper-teacher-hide{
    display: none;

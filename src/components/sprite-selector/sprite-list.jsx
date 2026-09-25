@@ -17,6 +17,7 @@ const ThrottledSpriteSelectorItem = ThrottledPropertyHOC('asset', 500)(SpriteSel
 const SpriteList = function (props) {
   const {
     containerRef,
+    currentLayout,
     editingTarget,
     draggingIndex,
     draggingType,
@@ -37,7 +38,7 @@ const SpriteList = function (props) {
 
   return (
     <Box
-      className={classNames(styles.scrollWrapper, {
+      className={classNames(currentLayout === 'teacher' ? styles.scrollWrapperTeacher : styles.scrollWrapper, {
         [styles.scrollWrapperDragging]: draggingType === DragConstants.BACKPACK_SPRITE,
       })}
       componentRef={containerRef}
@@ -105,6 +106,7 @@ const SpriteList = function (props) {
 
 SpriteList.propTypes = {
   containerRef: PropTypes.func,
+  currentLayout: PropTypes.string,
   draggingIndex: PropTypes.number,
   draggingType: PropTypes.oneOf(Object.keys(DragConstants)),
   editingTarget: PropTypes.string,
