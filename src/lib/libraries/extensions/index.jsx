@@ -338,7 +338,7 @@ export default [
     description: (
       <FormattedMessage
         defaultMessage='Train and use machine learning models'
-        description="Description for the 'Teachable Machine' extension"
+        description="Description for the Teachable Machine extension"
         id='gui.extension.teachableMachine.description'
       />
     ),
