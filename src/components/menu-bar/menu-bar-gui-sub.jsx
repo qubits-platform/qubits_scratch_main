@@ -445,7 +445,6 @@ class MenuBarGuiSub extends React.Component {
   }
 
   async fetchChpaterData(scratchUrl) {
-    console.log('Fetching chapter data from URL:', scratchUrl)
     if (!scratchUrl) return
      this.props.addNotification({
         type: 'saving',
@@ -564,7 +563,6 @@ class MenuBarGuiSub extends React.Component {
         this.onLocalStorageFileUploadStudentChallenge(result.submission)
       } else if(currentLayout === 'normal'){
          const response = await fetch(scratchUrl);
-         console.log('Fetching project from URL:', scratchUrl)
          const blob = await response.blob();
          this.onLocalStorageFileUploadFromBlob(blob);
       } 
