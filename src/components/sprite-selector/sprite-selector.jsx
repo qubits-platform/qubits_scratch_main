@@ -42,6 +42,7 @@ const messages = defineMessages({
 
 const SpriteSelectorComponent = function (props) {
   const {
+    currentLayout,
     editingTarget,
     hoveredTarget,
     intl,
@@ -99,6 +100,7 @@ const SpriteSelectorComponent = function (props) {
       />
 
       <SpriteList
+        currentLayout={currentLayout}
         editingTarget={editingTarget}
         hoveredTarget={hoveredTarget}
         items={Object.keys(sprites).map((id) => sprites[id])}
@@ -148,6 +150,7 @@ const SpriteSelectorComponent = function (props) {
 }
 
 SpriteSelectorComponent.propTypes = {
+  currentLayout: PropTypes.string,
   editingTarget: PropTypes.string,
   hoveredTarget: PropTypes.shape({
     hoveredSprite: PropTypes.string,

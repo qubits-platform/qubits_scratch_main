@@ -50,6 +50,7 @@ const TargetPane = ({
 }) => (
   <div className={styles.targetPane} {...componentProps}>
     <SpriteSelectorComponent
+      currentLayout={currentLayout}
       editingTarget={editingTarget}
       hoveredTarget={hoveredTarget}
       raised={raiseSprites}
@@ -122,6 +123,7 @@ const spriteShape = PropTypes.shape({
 })
 
 TargetPane.propTypes = {
+  currentLayout: PropTypes.string,
   editingTarget: PropTypes.string,
   extensionLibraryVisible: PropTypes.bool,
   fileInputRef: PropTypes.func,
