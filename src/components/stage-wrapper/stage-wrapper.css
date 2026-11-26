@@ -39,27 +39,15 @@
 
 
 .stage-menu-wrapper-teacher{
-    position: absolute;
-    width: 100%;
-    right: 0;
-    top: 0;
+    position: relative;
     background-color: rgb(255, 255, 255);
 }
 .stage-menu-wrapper{
     background-color: rgb(255, 255, 255);
 }
-.stage-current-teacher{
-    position: relative;
-    right: 0;
-    margin-right: 0.3rem;
-    top: 0;
-    z-index: 100;
-    width: 40vw;
-    height: 55vh;
-    margin-top: 0.3rem;
-  }
   
-.stage-current-normal.full-screen{
+.stage-current-normal.full-screen,
+.stage-current-teacher.full-screen{
     position: fixed;
     top: $stage-menu-height;
     left: 0;
@@ -167,34 +155,15 @@
 
 }
 
-.stage-position-teacher{
-    display: flex;
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-    border-radius: $space;
-}
 
-.stage-position-teacher-hide{
-    display: flex;
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-    border-radius: $space;
-    /* border: $stage-standard-border-width solid $ui-black-transparent; */
-    /* visibility: hidden;
-    opacity: 0; */
-}
 .stage-canvas-wrapper-teacher{
-    border: 1px solid rgb(210, 210, 210);
-    border-radius: 7px;
-    height: 55vh;
+    /* Hides negative space between edge of rounded corners + container, when selected */
+    user-select: none;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: white;
+    border: 1px solid rgb(255, 255, 255) !important;
+    border-radius: 7px;
 }
 
 @media (max-width: 720px) {
@@ -204,16 +173,14 @@
     .stage-menu-wrapper{
         background-color: white;
     }
-    .stage-canvas-wrapper{
-        position: relative;
-        width: 100%;
-    }
+    .stage-canvas-wrapper,
     .stage-canvas-wrapper-teacher{
         position: relative;
         width: 100%;
-        left: 10%;
     }
-    .stage-position{
+
+    .stage-position,
+    .stage-position-teacher{
         position: absolute;
         bottom: 0;
         width: 100vw;
@@ -232,7 +199,8 @@
         visibility: visible;
         opacity: 1;
     }
-    .stage-position-hide{
+    .stage-position-hide,
+    .stage-position-teacher-hide{
         position: absolute;
         bottom: 0;
         width: 100vw;
