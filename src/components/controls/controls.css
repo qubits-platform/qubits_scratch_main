@@ -17,11 +17,13 @@
     left: 20rem;
 }
 
-.controls-container-teacher {
+.controls-container-teacher{
     display: flex;
     gap: 0.4rem;
     justify-content: center;
     align-items: center;
+    height: 100%;
+    /* sit to the left of the absolutely positioned stage size/fullscreen buttons */
     position: absolute;
     right: 7.6rem;
 }
@@ -113,39 +115,11 @@
 
 
 .sprite-icon-bg-teacher{
-    width: 100%;
-    height: 2rem;
-    user-select: none;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: rgb(235, 235, 235);
-    font-size: 0.7rem;
-    border:1px solid #855CD6;
-    border-radius: 4px;
-    background-color: #6338b8;
-    white-space: nowrap;
-    padding-left: 5px;
-    padding-right: 5px;
-
+    display: none;
 }
 
 .sprite-icon-bg-teacher-hide{
-    font-size: 0.7rem;
-    height: 2rem;
-    color: rgb(255, 255, 255);
-    cursor: pointer;
-    border:1px solid #855CD6;
-    border-radius: 4px;
-    background-color: #855CD6;
-    white-space: nowrap;
-    padding-left: 5px;
-    padding-right: 5px;
-
-}
-.sprite-icon-bg-teacher-hide:hover{
-    background-color: #8c6ad1;
+    display: none;
 }
 .sprite-image-outer {
     position: relative;
@@ -249,7 +223,8 @@
 
     }
 
-    .sprite-icon-bg{
+    .sprite-icon-bg,
+    .sprite-icon-bg-teacher{
         width: 100%;
         height: 2rem;
         user-select: none;
@@ -268,7 +243,8 @@
     
     }
     
-    .sprite-icon-hide{
+    .sprite-icon-hide,
+    .sprite-icon-bg-teacher-hide{
         width: 100%;
         height: 2rem;
         user-select: none;
@@ -286,7 +262,8 @@
         white-space: nowrap;
     
     }
-    .sprite-icon-hide:hover{
+    .sprite-icon-hide:hover,
+    .sprite-icon-bg-teacher-hide:hover{
         background-color: #8c6ad1;
     }
     .sprite-image-outer {

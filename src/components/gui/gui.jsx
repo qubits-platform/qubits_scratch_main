@@ -551,42 +551,40 @@ const GUIComponent = (props) => {
                     selectedTabPanelClassName={tabClassNames.tabPanelSelected}
                     onSelect={onActivateTab}
                   >
-                    {currentLayout !== 'teacher' && (
-                      <TabList className={tabClassNames.tabList}>
-                        <Tab className={tabClassNames.tab}>
-                          <img draggable={false} src={codeIcon} />
+                    <TabList className={tabClassNames.tabList}>
+                      <Tab className={tabClassNames.tab}>
+                        <img draggable={false} src={codeIcon} />
+                        <FormattedMessage
+                          defaultMessage='Code'
+                          description='Button to get to the code panel'
+                          id='gui.gui.codeTab'
+                        />
+                      </Tab>
+                      <Tab className={tabClassNames.tab} onClick={onActivateCostumesTab}>
+                        <img draggable={false} src={costumesIcon} />
+                        {targetIsStage ? (
                           <FormattedMessage
-                            defaultMessage='Code'
-                            description='Button to get to the code panel'
-                            id='gui.gui.codeTab'
+                            defaultMessage='Backdrops'
+                            description='Button to get to the backdrops panel'
+                            id='gui.gui.backdropsTab'
                           />
-                        </Tab>
-                        <Tab className={tabClassNames.tab} onClick={onActivateCostumesTab}>
-                          <img draggable={false} src={costumesIcon} />
-                          {targetIsStage ? (
-                            <FormattedMessage
-                              defaultMessage='Backdrops'
-                              description='Button to get to the backdrops panel'
-                              id='gui.gui.backdropsTab'
-                            />
-                          ) : (
-                            <FormattedMessage
-                              defaultMessage='Costumes'
-                              description='Button to get to the costumes panel'
-                              id='gui.gui.costumesTab'
-                            />
-                          )}
-                        </Tab>
-                        <Tab className={tabClassNames.tab} onClick={onActivateSoundsTab}>
-                          <img draggable={false} src={soundsIcon} />
+                        ) : (
                           <FormattedMessage
-                            defaultMessage='Sounds'
-                            description='Button to get to the sounds panel'
-                            id='gui.gui.soundsTab'
+                            defaultMessage='Costumes'
+                            description='Button to get to the costumes panel'
+                            id='gui.gui.costumesTab'
                           />
-                        </Tab>
-                      </TabList>
-                    )}
+                        )}
+                      </Tab>
+                      <Tab className={tabClassNames.tab} onClick={onActivateSoundsTab}>
+                        <img draggable={false} src={soundsIcon} />
+                        <FormattedMessage
+                          defaultMessage='Sounds'
+                          description='Button to get to the sounds panel'
+                          id='gui.gui.soundsTab'
+                        />
+                      </Tab>
+                    </TabList>
                     <TabPanel className={tabClassNames.tabPanel} >
                       <Box
                         className={styles.blocksWrapper}
@@ -605,21 +603,19 @@ const GUIComponent = (props) => {
                           currentLayout={currentLayout}
                         />
                       </Box>
-                      {currentLayout !== 'teacher' && (
-                        <Box className={styles.extensionButtonContainer}>
-                          <button
-                            className={styles.extensionButton}
-                            title={intl.formatMessage(messages.addExtension)}
-                            onClick={onExtensionButtonClick}
-                          >
-                            <img
-                              className={styles.extensionButtonIcon}
-                              draggable={false}
-                              src={addExtensionIcon}
-                            />
-                          </button>
-                        </Box>
-                      )}
+                      <Box className={styles.extensionButtonContainer}>
+                        <button
+                          className={styles.extensionButton}
+                          title={intl.formatMessage(messages.addExtension)}
+                          onClick={onExtensionButtonClick}
+                        >
+                          <img
+                            className={styles.extensionButtonIcon}
+                            draggable={false}
+                            src={addExtensionIcon}
+                          />
+                        </button>
+                      </Box>
                       <Box className={styles.watermark}>
                         <Watermark />
                       </Box>
@@ -641,7 +637,7 @@ const GUIComponent = (props) => {
 
                 <Box
                   className={classNames(
-                    currentLayout === 'teacher' || currentLayout === 'student'
+                    currentLayout === 'student'
                       ? styles.stageAndTargetWrapperStlayout
                       : styles.stageAndTargetWrapper,
                     styles[stageSize],
@@ -663,22 +659,16 @@ const GUIComponent = (props) => {
                         ? spriteClicked
                           ? styles.targetWrapperStudent
                           : styles.targetWrapperStudentHide
-                        : currentLayout === 'teacher'
-                          ? spriteClicked
-                            ? styles.targetWrapperTeacher
-                            : styles.targetWrapperTeacherHide
-                          : spriteClicked
-                            ? styles.targetWrapper
-                            : styles.targetWrapperHide
+                        : spriteClicked
+                          ? styles.targetWrapper
+                          : styles.targetWrapperHide
                     }
                   >
                     <button
                       className={
                         currentLayout === 'student'
                           ? styles.canvasPosStudent
-                          : currentLayout === 'teacher'
-                            ? styles.canvasPosTeacher
-                            : styles.canvasPos
+                          : styles.canvasPos
                       }
                       onClick={() => props.setSpriteClickedState(false)}
                     >

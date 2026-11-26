@@ -22,15 +22,14 @@
 
     position: absolute;
     top: 0;
+    right: 0;
     bottom: 0;
-    height: 55vh !important;
-    width: 84vw ;
-    margin-top: 0.3rem;
-    left: -30% !important;
+    left: 0;
     border: 1px solid $ui-black-transparent;
     border-top-right-radius: $space;
     border-bottom-right-radius: $space;
 }
+
 
 [dir="rtl"] .blocksteacher :global(.injectionDiv) {
     border-top-right-radius: 0;
@@ -40,6 +39,7 @@
 }
 
 .blocksteacher :global(.blocklyMainBackground) {
+
     stroke: none;
 }
 
@@ -56,7 +56,7 @@
         same for Firefox, so a different solution may be needed for them.
     */
     -ms-overflow-style: none;
-} 
+}
 
 [dir="rtl"] .blocksteacher :global(.blocklyToolboxDiv) {
     border-right: none;
@@ -75,6 +75,7 @@
 [dir="rtl"] .blocksteacher :global(.blocklyFlyout) {
     border-right: none;
     border-left: 1px solid $ui-black-transparent;
+
 }
 
 
@@ -100,8 +101,6 @@
     min-width: auto;
     min-height: auto;
 }
-@media (min-width: 1025px) {
-    .blocksteacher :global(.injectionDiv) {
-        left: -310px !important; 
-    }
-}
+
+
+
